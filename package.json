@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
   "name": "reprompting-profile-branded",
-=======
-  "name": "reprompting-profile-app",
->>>>>>> 500feeeddcb2d7b385e592983f3f1383d7b88135
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -13,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-<<<<<<< HEAD
     "next": "15.1.6",
     "react": "19.0.0",
     "react-dom": "19.0.0"
@@ -25,17 +20,5 @@
     "typescript": "5.7.3",
     "eslint": "9.18.0",
     "eslint-config-next": "15.1.6"
-=======
-    "@anthropic-ai/sdk": "^0.56.0",
-    "next": "^15.3.4",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
-  },
-  "devDependencies": {
-    "@types/node": "^22.15.30",
-    "@types/react": "^19.0.12",
-    "@types/react-dom": "^19.0.4",
-    "typescript": "^5.8.3"
->>>>>>> 500feeeddcb2d7b385e592983f3f1383d7b88135
   }
 }
