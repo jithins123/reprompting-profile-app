@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { questions } from "@/lib/questions";
+import { questions } from "../lib/questions";
 
 type Answer = { questionId: string; question: string; selectedId: string; selectedLabel: string; customText?: string };
 type Step = "intro" | "questions" | "reflection" | "contact" | "result";
