@@ -4,7 +4,8 @@ A Vercel-ready Next.js app for The Reprompting Project.
 
 ## Features
 
-- Branded 11-question Reprompting Profile experience
+- Branded 14-question Reprompting Profile experience
+- Stakes-focused questions that surface pattern cost, momentum, and next-chapter desire
 - "Something else" free-text option for every question
 - Final reflection question
 - Contact capture with consent confirmation
