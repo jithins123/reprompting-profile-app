@@ -132,9 +132,13 @@ ${JSON.stringify(payload, null, 2)}
     }
 
     const data = await anthropicRes.json();
-    const text = data?.content?.[0]?.text || "";
-    const cleaned = text.replace(/```json|```/g, "").trim();
-    const insight = sanitizeInsight(JSON.parse(cleaned));
+    const text = extractText(data);
+    if (!text) {
+      throw new Error(`Anthropic returned no text content. stop_reason=${data?.stop_reason || "unknown"}`);
+    }
+
+    const jsonText = extractJsonObject(text);
+    const insight = sanitizeInsight(JSON.parse(jsonText));
 
     if (!insight) throw new Error("Anthropic returned an invalid profile shape");
 
@@ -144,4 +148,24 @@ ${JSON.stringify(payload, null, 2)}
     console.error("Anthropic insight generation failed", error);
     return NextResponse.json({ insight: fallbackInsight, source: "fallback-error", debug });
   }
+}
+
+function extractText(data: any) {
+  if (!Array.isArray(data?.content)) return "";
+  return data.content
+    .map((block: any) => typeof block?.text === "string" ? block.text : "")
+    .join("\n")
+    .trim();
+}
+
+function extractJsonObject(text: string) {
+  const cleaned = text.replace(/```json|```/g, "").trim();
+  const start = cleaned.indexOf("{");
+  const end = cleaned.lastIndexOf("}");
+
+  if (start === -1 || end === -1 || end <= start) {
+    throw new Error(`Anthropic returned no JSON object. text=${cleaned.slice(0, 500)}`);
+  }
+
+  return cleaned.slice(start, end + 1);
 }
