@@ -1,10 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { questions } from "../lib/questions";
 
 type Answer = { questionId: string; question: string; selectedId: string; selectedLabel: string; customText?: string };
-type Step = "intro" | "questions" | "reflection" | "contact" | "processing" | "result";
+type Step = "intro" | "questions" | "reflection" | "contact" | "processing" | "result" | "alreadyCompleted";
 
 type Insight = {
   dominant_prompt: string;
@@ -37,6 +37,7 @@ const fallbackInsight: Insight = {
 };
 
 const processingDelayMs = 7000;
+const completionStorageKey = "reprompting_profile_completed";
 const ctaUrl = process.env.NEXT_PUBLIC_CTA_URL || "";
 
 export default function Home() {
@@ -53,6 +54,10 @@ export default function Home() {
   const question = questions[index];
   const currentAnswer = question ? answers[question.id] : undefined;
   const progress = useMemo(() => Math.round(((index + 1) / questions.length) * 100), [index]);
+
+  useEffect(() => {
+    if (hasCompletedProfile()) setStep("alreadyCompleted");
+  }, []);
 
   function choose(optionId: string, optionLabel: string) {
     setAnswers(prev => ({
@@ -89,6 +94,12 @@ export default function Home() {
 
   async function generateInsight() {
     setError("");
+    if (hasCompletedProfile()) {
+      setStep("alreadyCompleted");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
     if (!contact.firstName.trim() || !contact.email.trim()) {
       setError("Please add your first name and email address.");
       return;
@@ -123,8 +134,15 @@ export default function Home() {
       ]);
 
       const data = await res.json();
+      if (data?.status === "already_completed") {
+        markProfileCompleted();
+        setStep("alreadyCompleted");
+        return;
+      }
+
       const generated = normalizeInsight(data?.insight);
       setInsight(generated);
+      markProfileCompleted();
       setStep("result");
 
       await fetch("/api/webhook", {
@@ -135,6 +153,7 @@ export default function Home() {
     } catch {
       await delay(processingDelayMs);
       setInsight(fallbackInsight);
+      markProfileCompleted();
       setStep("result");
     } finally {
       setLoading(false);
@@ -163,6 +182,19 @@ export default function Home() {
             <div className="disclaimer"><strong>Important:</strong> This profile is for educational and reflective purposes only. It is not a diagnosis, clinical assessment, mental health report, or definitive statement about who you are. Your results are possible patterns suggested by your answers, offered as a starting point for self-observation and personal inquiry.</div>
             <div className="actions">
               <button className="btn primary" onClick={() => setStep("questions")}>🚀 Begin Profile</button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {step === "alreadyCompleted" && (
+        <section className="card processing-card">
+          <div className="card-inner processing-inner">
+            <div className="progress-label">Profile Already Completed</div>
+            <h2 className="question-title">Looks like you've already taken this quiz.</h2>
+            <p className="small processing-copy">If you're still curious, or want to understand what your result means for your next chapter, book a call and we can explore it together.</p>
+            <div className="actions">
+              <button className="btn primary" onClick={openCta} disabled={!ctaUrl}>Book Your Reprompting Call</button>
             </div>
           </div>
         </section>
@@ -278,6 +310,16 @@ export default function Home() {
 
 function ResultBox({ title, text }: { title: string; text: string }) {
   return <div className="result-box"><h3>{title}</h3><p>{text}</p></div>;
+}
+
+function hasCompletedProfile() {
+  if (typeof window === "undefined") return false;
+  return window.localStorage.getItem(completionStorageKey) === "true";
+}
+
+function markProfileCompleted() {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(completionStorageKey, "true");
 }
 
 function normalizeInsight(value: unknown): Insight {
