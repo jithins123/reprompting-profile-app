@@ -120,14 +120,17 @@ ${JSON.stringify(payload, null, 2)}
         "anthropic-version": "2023-06-01"
       },
       body: JSON.stringify({
-        model: "claude-3-5-sonnet-20241022",
+        model: "claude-sonnet-5",
         max_tokens: 1700,
         temperature: 0.7,
         messages: [{ role: "user", content: prompt }]
       })
     });
 
-    if (!anthropicRes.ok) throw new Error("Anthropic request failed");
+    if (!anthropicRes.ok) {
+      const errorText = await anthropicRes.text();
+      throw new Error(`Anthropic request failed: ${anthropicRes.status} ${errorText}`);
+    }
 
     const data = await anthropicRes.json();
     const text = data?.content?.[0]?.text || "";
@@ -137,7 +140,9 @@ ${JSON.stringify(payload, null, 2)}
     if (!insight) throw new Error("Anthropic returned an invalid profile shape");
 
     return NextResponse.json({ insight, source: "anthropic" });
-  } catch {
-    return NextResponse.json({ insight: fallbackInsight, source: "fallback-error" });
+  } catch (error) {
+    const debug = error instanceof Error ? error.message : "Unknown Anthropic error";
+    console.error("Anthropic insight generation failed", error);
+    return NextResponse.json({ insight: fallbackInsight, source: "fallback-error", debug });
   }
 }
