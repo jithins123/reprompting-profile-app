@@ -1,102 +1,66 @@
-<<<<<<< HEAD
-# Reprompting Profile™ App
+# The Reprompting Profile App
 
 A Vercel-ready Next.js app for The Reprompting Project.
 
 ## Features
 
-- Branded Reprompting Project quiz experience
-- Barlow Condensed, Inter, and Cormorant Garamond fonts
-- Black/gold cinematic styling
-- 11 profile questions
-- “Something else” custom responses
+- Branded 11-question Reprompting Profile experience
+- "Something else" free-text option for every question
 - Final reflection question
-- Contact capture
-- AI-generated educational profile
-- Optional GHL webhook submission
-- Non-diagnostic disclaimers
-
-## Environment Variables
-
-Add these in Vercel:
-
-```env
-ANTHROPIC_API_KEY=your_anthropic_key_here
-GHL_WEBHOOK_URL=your_ghl_webhook_url_here
-```
-
-`ANTHROPIC_API_KEY` is optional. If missing, the app uses a fallback result.
-
-`GHL_WEBHOOK_URL` is optional. If missing, the app still works but does not send lead data anywhere.
+- Contact capture with consent confirmation
+- Educational, non-diagnostic disclaimer language
+- AI-generated profile using Anthropic Claude when configured
+- Fallback profile when no Anthropic API key is configured
+- Optional lead submission to a GHL-compatible webhook
+- Basic request validation, body-size checks, same-origin checks, and rate limiting on API routes
 
 ## Local Development
-=======
-# The Reprompting Profile™ App
-
-A Vercel-ready Next.js app for The Reprompting Project.
-
-## What it includes
-
-- 11-question Reprompting Profile assessment
-- “Something else” free-text option for every question
-- Final reflection question
-- Contact capture screen
-- Educational/non-diagnostic disclaimer language
-- AI-generated profile using Anthropic Claude, if configured
-- Fallback profile if no API key is configured
-- Optional webhook POST to GHL, Zapier, Make, Pabbly, etc.
-
-## Local setup
->>>>>>> 500feeeddcb2d7b385e592983f3f1383d7b88135
 
 ```bash
 npm install
 npm run dev
 ```
 
-<<<<<<< HEAD
+Open `http://localhost:3000`.
+
 ## Build
 
 ```bash
 npm run build
-```
-=======
-Open `http://localhost:3000`.
-
-## Environment variables
-
-Create `.env.local`:
-
-```bash
-ANTHROPIC_API_KEY=your_anthropic_api_key
-LEAD_WEBHOOK_URL=your_webhook_url
+npm run start
 ```
 
-Both are optional. If `ANTHROPIC_API_KEY` is missing, the app will show a fallback result. If `LEAD_WEBHOOK_URL` is missing, leads will not be sent anywhere.
+## Environment Variables
 
-## Deploy to Vercel
+Create `.env.local` for local development or add these in Vercel Project Settings:
 
-1. Create a new GitHub repo.
-2. Upload these files to the repo.
-3. Go to Vercel and import the repo.
-4. Add environment variables in Vercel Project Settings.
-5. Deploy.
+```env
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
+GHL_WEBHOOK_URL=your_ghl_webhook_url_here
+```
 
-## Customise
+`ANTHROPIC_API_KEY` is optional. If it is missing, the app returns a fallback reflective profile.
 
-- Questions: `src/app/data.ts`
+`GHL_WEBHOOK_URL` is optional. If it is missing, the app still works but does not send lead data anywhere.
+
+## Data Handling
+
+The app collects a user's first name, email address, optional phone number, quiz answers, and final reflection. When `ANTHROPIC_API_KEY` is configured, that information is sent to Anthropic to generate the reflective profile. When `GHL_WEBHOOK_URL` is configured, the contact details, answers, reflection, consent timestamp, and generated profile are forwarded to the configured webhook.
+
+The profile is educational and reflective only. It is not a diagnosis, treatment, therapy, clinical assessment, or definitive statement about the user.
+
+## Project Structure
+
+- Questions: `src/lib/questions.ts`
 - Main UI: `src/app/page.tsx`
-- AI prompt: `src/app/api/profile/route.ts`
-- Webhook capture: `src/app/api/lead/route.ts`
+- AI profile API: `src/app/api/insight/route.ts`
+- Webhook capture API: `src/app/api/webhook/route.ts`
+- Shared API safety helpers: `src/lib/security.ts`
 - Styling: `src/app/globals.css`
 
-## CTA link
+## Deployment
 
-In `src/app/page.tsx`, replace:
-
-```tsx
-<a className="btn" href="#">Book a Reprompting Session</a>
-```
-
-with your booking/application URL.
->>>>>>> 500feeeddcb2d7b385e592983f3f1383d7b88135
+1. Import this repository into Vercel.
+2. Add the environment variables you want to use.
+3. Deploy.
+4. Test the full quiz flow once with and once without webhook configuration.
