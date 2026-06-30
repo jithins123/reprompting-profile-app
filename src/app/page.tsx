@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { questions } from "../lib/questions";
 
 type Answer = { questionId: string; question: string; selectedId: string; selectedLabel: string; customText?: string };
-type Step = "intro" | "questions" | "reflection" | "contact" | "result";
+type Step = "intro" | "questions" | "reflection" | "contact" | "processing" | "result";
 
 type Insight = {
   dominant_prompt: string;
@@ -29,6 +29,9 @@ const fallbackInsight: Insight = {
   seven_day_experiment: "For the next seven days, notice one place where you delay because you are waiting for more certainty. Take one small action within 24 hours and record what you learned.",
   note: "This is an educational reflection based on your responses, not a diagnosis or final assessment. Use it as a starting point for self-observation."
 };
+
+const processingDelayMs = 2200;
+const ctaUrl = process.env.NEXT_PUBLIC_CTA_URL || "";
 
 export default function Home() {
   const [step, setStep] = useState<Step>("intro");
@@ -91,6 +94,9 @@ export default function Home() {
     }
 
     setLoading(true);
+    setStep("processing");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
     const payload = {
       contact,
       reflection,
@@ -101,11 +107,14 @@ export default function Home() {
     };
 
     try {
-      const res = await fetch("/api/insight", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+      const [res] = await Promise.all([
+        fetch("/api/insight", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        }),
+        delay(processingDelayMs)
+      ]);
 
       const data = await res.json();
       const generated = normalizeInsight(data?.insight);
@@ -118,12 +127,18 @@ export default function Home() {
         body: JSON.stringify({ ...payload, insight: generated })
       }).catch(() => undefined);
     } catch {
+      await delay(processingDelayMs);
       setInsight(fallbackInsight);
       setStep("result");
     } finally {
       setLoading(false);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
+  }
+
+  function openCta() {
+    if (!ctaUrl) return;
+    window.open(ctaUrl, "_blank", "noopener,noreferrer");
   }
 
   return (
@@ -193,7 +208,7 @@ export default function Home() {
           <div className="card-inner">
             <div className="progress-label">Generate Your Profile</div>
             <h2 className="question-title">Almost done.</h2>
-            <p className="small">Enter your details below and we'll generate your personalised Reprompting Profile™.</p>
+            <p className="small">Enter your details below and we'll generate your personalised Reprompting Profile.</p>
             <div className="form-grid">
               <input className="input" placeholder="First Name" value={contact.firstName} onChange={(e) => setContact({ ...contact, firstName: e.target.value })} maxLength={80} />
               <input className="input" placeholder="Email Address" type="email" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} maxLength={254} />
@@ -213,12 +228,23 @@ export default function Home() {
         </section>
       )}
 
+      {step === "processing" && (
+        <section className="card processing-card" aria-live="polite" aria-busy="true">
+          <div className="card-inner processing-inner">
+            <div className="processing-orbit" aria-hidden="true"><span /><span /><span /></div>
+            <div className="progress-label">Processing Your Profile</div>
+            <h2 className="question-title">Reading your answers with care.</h2>
+            <p className="small processing-copy">Your responses, reflection, and patterns are being shaped into a grounded Reprompting Profile.</p>
+          </div>
+        </section>
+      )}
+
       {step === "result" && insight && (
-        <section className="card">
+        <section className="card result-card">
           <div className="card-inner">
             <div className="progress-label">Your Reflective Profile</div>
             <h2 className="question-title">Here's what we noticed, {contact.firstName || "there"}.</h2>
-            <div className="disclaimer"><strong>Please remember:</strong> this is not a final result, diagnosis, or psychological assessment. It is an educational observation based on your answers — a possible map of prompts you may be running.</div>
+            <div className="disclaimer result-disclaimer"><strong>Please remember:</strong> this is not a final result, diagnosis, or psychological assessment. It is an educational observation based on your answers — a possible map of prompts you may be running.</div>
             <div className="result-grid">
               <ResultBox title="Dominant Prompt" text={insight.dominant_prompt} />
               <ResultBox title="Protective Prompt" text={insight.protective_prompt} />
@@ -229,8 +255,10 @@ export default function Home() {
               <ResultBox title="Personal Reprompt™" text={`“${insight.new_prompt}”`} />
               <ResultBox title="7-Day Experiment" text={insight.seven_day_experiment} />
             </div>
-            <div className="actions">
-              <button className="btn secondary" onClick={() => window.location.reload()}>Retake Profile</button>
+            <div className="cta-panel">
+              <h3>Bring this shift into your life.</h3>
+              <p>Book a call to explore your profile, choose your next clear step, and begin living from your power with support and direction.</p>
+              <button className="btn primary" onClick={openCta} disabled={!ctaUrl}>Book Your Reprompting Call</button>
             </div>
           </div>
         </section>
@@ -272,4 +300,8 @@ function isString(value: unknown): value is string {
 
 function formatList(value: string[]) {
   return value.length ? value.join(" • ") : "No pattern detected.";
+}
+
+function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
