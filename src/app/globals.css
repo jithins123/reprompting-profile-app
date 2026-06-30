@@ -71,26 +71,44 @@ a { color: inherit; }
   text-transform: uppercase;
 }
 .title {
-  margin: 0;
+  display: grid;
+  justify-items: center;
+  row-gap: 8px;
+  width: 100%;
+  max-width: 940px;
+  margin: 0 auto;
   font-family: "Barlow Condensed", sans-serif;
-  font-size: clamp(72px, 14vw, 164px);
-  line-height: .77;
-  letter-spacing: -.025em;
+  font-size: clamp(56px, 8.4vw, 116px);
+  line-height: .88;
+  letter-spacing: 0;
   text-transform: uppercase;
   text-shadow: 0 0 24px rgba(120,154,255,0.26);
 }
-.script {
+.title span {
   display: block;
-  margin-top: 22px;
+  max-width: 100%;
+  overflow-wrap: normal;
+}
+.script {
+  margin-top: 10px;
   color: var(--gold-soft);
   font-family: "Cormorant Garamond", serif;
   font-style: italic;
-  font-size: clamp(48px, 8vw, 108px);
-  line-height: .9;
+  font-size: clamp(48px, 7vw, 96px);
+  line-height: .95;
   font-weight: 600;
   text-transform: none;
-  letter-spacing: -.04em;
   text-shadow: 0 0 24px rgba(216,173,74,0.16);
+}
+.script sup {
+  display: inline-block;
+  margin-left: 4px;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: .24em;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: .04em;
+  vertical-align: super;
 }
 .lead {
   max-width: 760px;
@@ -211,6 +229,9 @@ a { color: inherit; }
 @media (max-width: 720px) {
   .shell { width: min(100% - 22px, 1060px); padding-top: 18px; }
   .hero-inner, .card-inner { padding: 28px 18px; }
+  .kicker { font-size: 14px; letter-spacing: .2em; }
+  .title { font-size: clamp(46px, 16vw, 72px); row-gap: 4px; }
+  .script { font-size: clamp(40px, 13vw, 62px); }
   .topbar { align-items: flex-start; flex-direction: column; }
   .progress-track { max-width: none; width: 100%; }
   .btn { width: 100%; }
