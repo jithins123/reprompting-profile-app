@@ -29,12 +29,15 @@ export type RepromptingPayload = {
 export type InsightPayload = {
   dominant_prompt: string;
   protective_prompt: string;
+  pattern_cost: string;
   emerging_prompt: string;
   hidden_strengths: string[];
-  blind_spots: string[];
+  growth_edges: string[];
   old_prompt: string;
   new_prompt: string;
+  why_this_matters_now: string;
   seven_day_experiment: string;
+  session_bridge: string;
   note: string;
 };
 
@@ -149,24 +152,30 @@ export function sanitizeInsight(input: unknown): InsightPayload | null {
   const insight = {
     dominant_prompt: cleanText(body.dominant_prompt, MAX_TEXT_LENGTH),
     protective_prompt: cleanText(body.protective_prompt, MAX_TEXT_LENGTH),
+    pattern_cost: cleanText(body.pattern_cost, MAX_TEXT_LENGTH),
     emerging_prompt: cleanText(body.emerging_prompt, MAX_TEXT_LENGTH),
     hidden_strengths: cleanList(body.hidden_strengths, 5),
-    blind_spots: cleanList(body.blind_spots, 5),
+    growth_edges: cleanList(body.growth_edges, 5),
     old_prompt: cleanText(body.old_prompt, MAX_SHORT_TEXT_LENGTH),
     new_prompt: cleanText(body.new_prompt, MAX_SHORT_TEXT_LENGTH),
+    why_this_matters_now: cleanText(body.why_this_matters_now, MAX_TEXT_LENGTH),
     seven_day_experiment: cleanText(body.seven_day_experiment, MAX_TEXT_LENGTH),
+    session_bridge: cleanText(body.session_bridge, MAX_TEXT_LENGTH),
     note: cleanText(body.note, MAX_TEXT_LENGTH)
   };
 
   if (
     !insight.dominant_prompt ||
     !insight.protective_prompt ||
+    !insight.pattern_cost ||
     !insight.emerging_prompt ||
     insight.hidden_strengths.length === 0 ||
-    insight.blind_spots.length === 0 ||
+    insight.growth_edges.length === 0 ||
     !insight.old_prompt ||
     !insight.new_prompt ||
+    !insight.why_this_matters_now ||
     !insight.seven_day_experiment ||
+    !insight.session_bridge ||
     !insight.note
   ) {
     return null;
