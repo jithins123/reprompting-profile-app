@@ -173,6 +173,23 @@ a { color: inherit; }
 .nav { display: flex; justify-content: space-between; gap: 14px; margin-top: 28px; flex-wrap: wrap; }
 .small { color: var(--muted); font-size: 14px; line-height: 1.55; }
 .form-grid { display: grid; gap: 12px; max-width: 620px; }
+.consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 860px;
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.consent input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--gold);
+  flex: 0 0 auto;
+}
 .result-grid { display: grid; gap: 16px; }
 .result-box {
   border: 1px solid rgba(216,173,74,0.22);
