@@ -103,6 +103,39 @@ export const questions: Question[] = [
   },
   {
     id: "q10",
+    title: "When you look back at the last 12 months, where do you feel you held yourself back the most?",
+    options: [
+      { id: "waited", label: "I waited longer than I needed to act." },
+      { id: "doubted", label: "I doubted myself when part of me already knew." },
+      { id: "busy", label: "I stayed busy while avoiding the real move." },
+      { id: "adapted", label: "I adapted to others instead of choosing clearly for myself." },
+      { id: "other", label: "✍️ Something else..." }
+    ]
+  },
+  {
+    id: "q11",
+    title: "What does this pattern feel like it has started to cost you?",
+    options: [
+      { id: "time", label: "Time I can't get back." },
+      { id: "confidence", label: "Confidence in my own decisions." },
+      { id: "opportunity", label: "Opportunities, money, or momentum." },
+      { id: "energy", label: "Energy that could be going into my next chapter." },
+      { id: "other", label: "✍️ Something else..." }
+    ]
+  },
+  {
+    id: "q12",
+    title: "If this pattern kept running quietly for another year, what would feel hardest to accept?",
+    options: [
+      { id: "same-place", label: "Still being in the same place." },
+      { id: "more-in-me", label: "Knowing I had more in me." },
+      { id: "passed", label: "Watching important opportunities pass." },
+      { id: "power", label: "Feeling disconnected from my own power." },
+      { id: "other", label: "✍️ Something else..." }
+    ]
+  },
+  {
+    id: "q13",
     title: "Imagine we're having this conversation again one year from today. What would make you feel this year had been truly worthwhile?",
     options: [
       { id: "acted", label: "I'd have finally acted on something that's been important to me." },
@@ -113,7 +146,7 @@ export const questions: Question[] = [
     ]
   },
   {
-    id: "q11",
+    id: "q14",
     title: "As you've answered these questions, which statement best describes your approach?",
     options: [
       { id: "usual", label: "I've been choosing the answers that reflect what I usually do." },
