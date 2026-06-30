@@ -122,7 +122,6 @@ ${JSON.stringify(payload, null, 2)}
       body: JSON.stringify({
         model: "claude-sonnet-5",
         max_tokens: 1700,
-        temperature: 0.7,
         messages: [{ role: "user", content: prompt }]
       })
     });
