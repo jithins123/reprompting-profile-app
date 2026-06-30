@@ -2,13 +2,16 @@
   "name": "reprompting-profile-app",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
-    "next": "15.1.11",
+    "next": "16.2.9",
     "react": "19.0.1",
     "react-dom": "19.0.1"
   },
