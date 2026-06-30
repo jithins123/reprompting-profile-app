@@ -44,6 +44,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid profile submission." }, { status: 400 });
   }
 
+  try {
+    const alreadyCompleted = await hasCompletedProfileInGhl(payload.contact.email);
+    if (alreadyCompleted) {
+      return NextResponse.json({ status: "already_completed", source: "ghl-completed-tag" });
+    }
+  } catch (error) {
+    console.warn("GHL completion check failed", error);
+  }
+
   const apiKey = process.env.ANTHROPIC_API_KEY;
 
   if (!apiKey) {
@@ -148,6 +157,72 @@ ${JSON.stringify(payload, null, 2)}
     console.error("Anthropic insight generation failed", error);
     return NextResponse.json({ insight: fallbackInsight, source: "fallback-error", debug });
   }
+}
+
+async function hasCompletedProfileInGhl(email: string) {
+  const apiToken = process.env.GHL_API_TOKEN || process.env.GHL_PRIVATE_INTEGRATION_TOKEN || process.env.GHL_API_KEY;
+  const locationId = process.env.GHL_LOCATION_ID;
+  const completedTag = process.env.GHL_COMPLETED_TAG || "reprompting-profile-completed";
+  const apiVersion = process.env.GHL_API_VERSION || "2021-07-28";
+
+  if (!apiToken || !locationId || !email) return false;
+
+  const headers = {
+    Accept: "application/json",
+    Authorization: `Bearer ${apiToken}`,
+    Version: apiVersion
+  };
+
+  const searchUrl = new URL("https://services.leadconnectorhq.com/contacts/search/duplicate");
+  searchUrl.searchParams.set("locationId", locationId);
+  searchUrl.searchParams.set("email", email);
+
+  const duplicateRes = await fetch(searchUrl, { headers, cache: "no-store" });
+  if (!duplicateRes.ok) {
+    throw new Error(`GHL duplicate contact search failed: ${duplicateRes.status} ${await duplicateRes.text()}`);
+  }
+
+  const duplicateData = await duplicateRes.json();
+  const duplicateContact = duplicateData?.contact || duplicateData;
+  if (contactHasTag(duplicateContact, completedTag)) return true;
+
+  const contactId = stringValue(duplicateContact?.id) || stringValue(duplicateData?.contactId);
+  if (!contactId) return false;
+
+  const contactRes = await fetch(`https://services.leadconnectorhq.com/contacts/${encodeURIComponent(contactId)}`, {
+    headers,
+    cache: "no-store"
+  });
+
+  if (!contactRes.ok) {
+    throw new Error(`GHL contact lookup failed: ${contactRes.status} ${await contactRes.text()}`);
+  }
+
+  const contactData = await contactRes.json();
+  return contactHasTag(contactData?.contact || contactData, completedTag);
+}
+
+function contactHasTag(contact: any, completedTag: string) {
+  const target = completedTag.trim().toLowerCase();
+  return normalizeTags(contact?.tags).some(tag => tag.toLowerCase() === target);
+}
+
+function normalizeTags(tags: unknown) {
+  if (!Array.isArray(tags)) return [];
+  return tags
+    .map(tag => {
+      if (typeof tag === "string") return tag.trim();
+      if (tag && typeof tag === "object") {
+        const value = tag as { name?: unknown; tag?: unknown; label?: unknown };
+        return stringValue(value.name) || stringValue(value.tag) || stringValue(value.label);
+      }
+      return "";
+    })
+    .filter(Boolean);
+}
+
+function stringValue(value: unknown) {
+  return typeof value === "string" && value.trim() ? value.trim() : "";
 }
 
 function extractText(data: any) {
