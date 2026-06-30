@@ -136,7 +136,7 @@ export default function Home() {
             <h1 className="title">
               <span>The</span>
               <span>Reprompting</span>
-              <span className="script">Profile<sup>TM</sup></span>
+              <span className="script">Profile</span>
             </h1>
             <p className="lead">Discover the system prompt quietly shaping your choices, confidence, relationships and next chapter.</p>
             <div className="disclaimer"><strong>Important:</strong> This profile is for educational and reflective purposes only. It is not a diagnosis, clinical assessment, mental health report, or definitive statement about who you are. Your results are possible patterns suggested by your answers, offered as a starting point for self-observation and personal inquiry.</div>
