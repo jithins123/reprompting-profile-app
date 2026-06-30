@@ -12,6 +12,7 @@ A Vercel-ready Next.js app for The Reprompting Project.
 - AI-generated profile using Anthropic Claude when configured
 - Fallback profile when no Anthropic API key is configured
 - Optional lead submission to a GHL-compatible webhook
+- Final result call-to-action button configured with a public booking URL
 - Basic request validation, body-size checks, same-origin checks, and rate limiting on API routes
 
 ## Local Development
@@ -37,11 +38,14 @@ Create `.env.local` for local development or add these in Vercel Project Setting
 ```env
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
 GHL_WEBHOOK_URL=your_ghl_webhook_url_here
+NEXT_PUBLIC_CTA_URL=https://your_booking_or_call_link_here
 ```
 
 `ANTHROPIC_API_KEY` is optional. If it is missing, the app returns a fallback reflective profile.
 
 `GHL_WEBHOOK_URL` is optional. If it is missing, the app still works but does not send lead data anywhere.
+
+`NEXT_PUBLIC_CTA_URL` is optional. If it is set, the final result screen opens this URL when the user clicks the booking CTA. It must start with `NEXT_PUBLIC_` because the button runs in the browser.
 
 ## Data Handling
 
