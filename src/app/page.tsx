@@ -36,7 +36,7 @@ const fallbackInsight: Insight = {
   note: "This is an educational reflection based on your responses, not a diagnosis or final assessment."
 };
 
-const processingDelayMs = 3800;
+const processingDelayMs = 7000;
 const ctaUrl = process.env.NEXT_PUBLIC_CTA_URL || "";
 
 export default function Home() {
