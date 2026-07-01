@@ -105,7 +105,11 @@ Return ONLY valid JSON with these exact keys:
 }
 
 Output guidance:
-- Keep each field concise and easy to understand.
+- Return complete JSON only. Do not include markdown, commentary, or text outside the JSON object.
+- Keep each string short enough that the entire response fits comfortably.
+- Use 1 sentence for dominant_prompt, protective_prompt, pattern_cost, emerging_prompt, why_this_matters_now, seven_day_experiment, session_bridge, and note.
+- Use 2 to 5 words for each hidden_strengths and growth_edges item.
+- Use 1 short sentence for old_prompt and new_prompt.
 - The result should feel premium, personal, empowering, and educational.
 - Avoid saying "you are". Prefer "your responses suggest", "one useful pattern may be", and "you may notice".
 - For "pattern_cost", name the likely cost without shame or panic. It should feel honest and motivating.
@@ -130,7 +134,7 @@ ${JSON.stringify(payload, null, 2)}
       },
       body: JSON.stringify({
         model: "claude-sonnet-5",
-        max_tokens: 1700,
+        max_tokens: 3200,
         messages: [{ role: "user", content: prompt }]
       })
     });
@@ -239,7 +243,7 @@ function extractJsonObject(text: string) {
   const end = cleaned.lastIndexOf("}");
 
   if (start === -1 || end === -1 || end <= start) {
-    throw new Error(`Anthropic returned no JSON object. text=${cleaned.slice(0, 500)}`);
+    throw new Error(`Anthropic returned no complete JSON object. text=${cleaned.slice(0, 500)}`);
   }
 
   return cleaned.slice(start, end + 1);
